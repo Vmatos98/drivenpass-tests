@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users{
+  id          Int       @id       @default(autoincrement())
+  email       String    @unique
+  password    String
+  userName    String
+  createdAt   DateTime  @default(now())
+
+  notes Notes[]
+  credentials Credentials[]
+  cards Cards[]
+  wifi Wifi[]
+}
+
+model Notes{
+  id Int @id @default(autoincrement())
+  title String 
+  content String
+  createdAt DateTime @default(now())
+  userId Int
+  user Users @relation(fields: [userId], references: [id])
+  @@unique(fields: [title, userId])
+  @@unique(fields: [id, userId], name : "credentialValidation")
+}
+
+model Credentials{
+  id          Int       @id       @default(autoincrement())
+  url         String
+  title       String
+  userName    String
+  password    String
+  userId      Int
+  createdAt   DateTime  @default(now())
+  user Users @relation(fields: [userId], references: [id])
+  @@unique(fields: [title, userId])
+  @@unique(fields: [id, userId], name : "credentialValidation")
+}
+
+model Cards{
+  id          Int       @id       @default(autoincrement())
+  number      String    @unique
+  cardName    String
+  expDate     String
+  cvv         String
+  password    String
+  isVirtual   Boolean
+  type        CardType
+  title       String
+  createdAt   DateTime  @default(now())
+  userId      Int
+  user Users @relation(fields: [userId], references: [id])
+  
+  @@unique(fields: [title, userId])
+  @@unique(fields: [id, userId], name : "credentialValidation")
+}
+
+model Wifi{
+  id          Int       @id       @default(autoincrement())
+  ssid        String
+  password    String
+  title       String
+  createdAt   DateTime  @default(now())
+  userId      Int
+  user Users @relation(fields: [userId], references: [id])
+  @@unique(fields: [id, userId], name : "credentialValidation")
+}
+
+enum CardType{
+  CREDIT
+  DEBIT
+  BOTH
+}
